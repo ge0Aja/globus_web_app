@@ -1,6 +1,6 @@
 # Globus Object Detection Web App
 
-![Logo LRI](img/Logo-LRI.jpg) ![Logo Paris Sud](img/Logo-Universite-Paris-Sud.jpg)
+![Logo LRI](img/Logo-LRI.jpg)
 
 
 ## Executive summary
