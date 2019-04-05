@@ -66,8 +66,6 @@ git submodule update
 ```
 +project_repo
 |	+--darknet
-|	|
-|	|
 |	|     +--cfg
 |	|     |	   +--globus13-yolov3.cfg
 |	|     |    +--globustags-yolov3.cfg
