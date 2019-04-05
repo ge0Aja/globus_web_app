@@ -64,17 +64,18 @@ git submodule update
 ```
 4. Copy the config files (cfg) and the data files (.data .names) from "globus_web_app_config_files" folder to "darknet/data" and "darknet/cfg" folders where the folder and file structure should be as follows:
 ```
-+--darknet
-|
-|
-+--cfg
-|  +--globus13-yolov3.cfg
-|  +--globustags-yolov3.cfg
-+--data
-|  +--globus_13.data
-|  +--globus_13.names
-|  +--globus_tags.data
-|  +--globus_tags.names
++project_repo
+|	+--darknet
+|	|
+|	|
+|	|     +--cfg
+|	|     |	   +--globus13-yolov3.cfg
+|	|     |    +--globustags-yolov3.cfg
+|	|     +--data
+|	|     |    +--globus_13.data
+|	|     |    +--globus_13.names
+|	|     |    +--globus_tags.data
+|	|     |    +--globus_tags.names
 ```
 5. Download models weights files from [Here](https://www.lri.fr/owncloud/index.php/s/tl6DSkTrqNMY346) and [Here](https://www.lri.fr/owncloud/index.php/s/CoSIqoJmg4dyJ87) Then, move them into “darknet/backup” folder
 6. Edit Dockerfile contents to enable/disable GPU support
