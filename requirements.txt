@@ -1,0 +1,4 @@
+Flask==1.0
+werkzeug==0.15.0
+opencv-python==3.4.5.20
+imutils==0.5.2
