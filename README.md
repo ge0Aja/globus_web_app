@@ -1,5 +1,8 @@
 # Globus Object Detection Web App
 
+![Logo LRI](img/Logo-LRI.jpg) ![Logo Paris Sud](img/Logo-Universite-Paris-Sud.jpg)
+
+
 ## Executive summary
 A brief documentation describing a grocery store object detection web app built for Globus supermarket.
 
