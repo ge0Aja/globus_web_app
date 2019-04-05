@@ -41,7 +41,7 @@ This method calls detect_video() method from Detector class and forwards the ret
 
 In the following table we list the web methods along with their expected request inputs and response outputs. The request inputs for all methods are structured as form data and the outputs are in JSON formatting. For testing we use a REST API client e.g. Postman or Curl.
 
-| __Method__ | __Type__ | __Input__ | __Output__ |
+| __Method__ | __Type__ | __Input__ | __Output__ (expected_responses folder) |
 | ---------- |----------|---------- |---------- |
 |   /state   | GET      | (empty)   | response_state.json |
 | /detect_img| POST     | Imagefile (PNG,JPG,JPEG) ; to_detect (product,tag) | response_tag_img.json response_product_img.json |
