@@ -1,6 +1,6 @@
 classes = 1
-train = /homee/all_tags_train.txt
-valid = /homee/all_tags_validate.txt
-names = data/globus_tags.names
-backup = backup/
+#train = /app/all_tags_train.txt
+#valid = /app/all_tags_validate.txt
+names = /app/darknet/data/globus_tags.names
+backup = /app/darknet/backup/
 
