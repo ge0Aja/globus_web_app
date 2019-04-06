@@ -50,6 +50,25 @@ In the following table we list the web methods along with their expected request
 | /detect_img| POST     | Imagefile (PNG,JPG,JPEG) ; to_detect (product,tag) | response_tag_img.json response_product_img.json |
 | /detect_vid| POST     | vidfile (AVI,MP4) ; to_detect (product,tag) | response_tag_vid.json response_product_vid.json |
 
+Looking at the JSON files of detections we can notice three parameters in the response, in the following table we show possible values for each parameter
+
+| __Parameter__ | __Description__ | __Possible values__ |
+| objs, objects | detected objects | [], dictionary, list|
+| cls | object's class | class name, unique ID |
+| h | height of detected object in pixels |  integer |
+| w | width of detected object in pixels | integer |
+| x | object's upper left corner X coord. | integer |
+| y | object's upper left corner Y coord. | integer |
+| t | elapsed time for detection | seconds |
+| ret | return state | objects found, empty, detectiontype error ,filetype error, error |
+
+The 'ret' parameter explains the state of the REST web service response which can be:
+* _objects_ _found_: it means that the detection model was able to detect objects in an image or any frame in the video
+* _empty_: it means no objects were detected in an image or a any frame in the video
+* _detectiontype_ _error_: indicates that the value of 'to_detect' parameter in the web request is not linked with the current detection model. Since the current implementation includes two models, the user should specify which object to detect (tag or product). This value has to be compatible with the depolyed model e.g. if we deploy the 'grocery tags' model the value of 'to_detect' parameter should be 'tag'.
+* _filetype_ _error_: indicates that the uploaded file type is not in the list of allowed types.
+* _error_: indicates a general error in the web application that has to be reviewed by the developer.
+
 ### Static Methods
 There are some static methods included in the application for debugging or file handling purposes. The methods are:
 * allow_file() checks if the uploaded file extension in the list of allowed extensions.
@@ -67,7 +86,7 @@ git submodule update
 ```
 4. Copy the config files (cfg) and the data files (.data .names) from "globus_web_app_config_files" folder to "darknet/data" and "darknet/cfg" folders where the folder and file structure should be as follows:
 ```
-+project_repo
++globus_web_app
 |	+--darknet
 |	|     +--cfg
 |	|     |	   +--globus13-yolov3.cfg
