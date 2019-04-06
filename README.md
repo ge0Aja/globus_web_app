@@ -103,7 +103,7 @@ git submodule update
 5. Download models weights files from [Here](https://www.lri.fr/owncloud/index.php/s/tl6DSkTrqNMY346) and [Here](https://www.lri.fr/owncloud/index.php/s/CoSIqoJmg4dyJ87) Then, move them into “darknet/backup” folder
 6. Edit Dockerfile contents to enable/disable GPU support
 If you want to disable GPU support or do not have Nvidia GPU set GPU, CUDNN, and CUDNN_HALF to 0 in Dockerfile and comment the following line
-“CMD nvidia-smi -q”
+“CMD nvidia-smi -q”. If you want to keep GPU support keep the Dockerfile as is.
 7. Edit Dockerfile contents to choose web app entry point
    * If you want to use DNN model for detecting products, under [“ENTRYPOINT”], set the name of the file “app.py”
    * If you want to use DNN model for detecting tags, under [“ENTRYPOINT”], set the name of the file “app2.py”
