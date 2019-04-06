@@ -81,7 +81,11 @@ There are some static methods included in the application for debugging or file 
 ## Deployment
 To deploy the web application on a local server follow these steps:
 1. Install Docker or Nvidi-Docker version 18.09.1 and above
-2. Clone the repository to your local machine
+2. Clone the repository to your local machine and change working directory
+```
+git clone repository_url
+cd globus_web_app
+```
 3. Init darknet submodule by executing the following command:
 ```
 git submodule init
@@ -100,14 +104,18 @@ git submodule update
 |	|     |    +--globus_tags.data
 |	|     |    +--globus_tags.names
 ```
-5. Download models weights files from [Here](https://www.lri.fr/owncloud/index.php/s/tl6DSkTrqNMY346) and [Here](https://www.lri.fr/owncloud/index.php/s/CoSIqoJmg4dyJ87) Then, move them into “darknet/backup” folder
-6. Edit Dockerfile contents to enable/disable GPU support
+5. create 'backup' directory within darknet folder
+```
+mkdir darknet/backup
+```
+6. Download models weights files from [Here](https://www.lri.fr/owncloud/index.php/s/tl6DSkTrqNMY346) and [Here](https://www.lri.fr/owncloud/index.php/s/CoSIqoJmg4dyJ87) Then, move them into “darknet/backup” folder
+7. Edit Dockerfile contents to enable/disable GPU support
 If you want to disable GPU support or do not have Nvidia GPU set GPU, CUDNN, and CUDNN_HALF to 0 in Dockerfile and comment the following line
 “CMD nvidia-smi -q”. If you want to keep GPU support keep the Dockerfile as is.
-7. Edit Dockerfile contents to choose web app entry point
+8. Edit Dockerfile contents to choose web app entry point
    * If you want to use DNN model for detecting products, under [“ENTRYPOINT”], set the name of the file “app.py”
    * If you want to use DNN model for detecting tags, under [“ENTRYPOINT”], set the name of the file “app2.py”
-8. Run Docker build inside the repository folder by executing the following command:
+9. Run Docker build inside the repository folder by executing the following command:
 ```
 docker (or nvidia-docker) build -t [image_name_of_choice]:latest .
 ```
