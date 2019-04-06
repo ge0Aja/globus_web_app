@@ -50,9 +50,11 @@ In the following table we list the web methods along with their expected request
 | /detect_img| POST     | Imagefile (PNG,JPG,JPEG) ; to_detect (product,tag) | response_tag_img.json response_product_img.json |
 | /detect_vid| POST     | vidfile (AVI,MP4) ; to_detect (product,tag) | response_tag_vid.json response_product_vid.json |
 
-Looking at the JSON files of detections we can notice three parameters in the response, in the following table we show possible values for each parameter
+
+By looking at the JSON files of detections we can notice three parameters in the response, in the following table we show possible values for each parameter
 
 | __Parameter__ | __Description__ | __Possible values__ |
+|---------------|-----------------|---------------------|
 | objs, objects | detected objects | [], dictionary, list|
 | cls | object's class | class name, unique ID |
 | h | height of detected object in pixels |  integer |
@@ -61,6 +63,7 @@ Looking at the JSON files of detections we can notice three parameters in the re
 | y | object's upper left corner Y coord. | integer |
 | t | elapsed time for detection | seconds |
 | ret | return state | objects found, empty, detectiontype error ,filetype error, error |
+
 
 The 'ret' parameter explains the state of the REST web service response which can be:
 * _objects_ _found_: it means that the detection model was able to detect objects in an image or any frame in the video
