@@ -323,7 +323,9 @@ class Detector():
                     inner+=1 
 
                 lis_outer.append(dict(frame=counter_out,objects=lis_inner))
-                counter_out+=1
+
+                if inner > 0:
+                    counter_out+=1
                 
                 # for debuging draw the detections around the frame and save the file to check it later
                 im  = cvDrawBoxes(res,frame_resized)
