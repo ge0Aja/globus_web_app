@@ -170,7 +170,7 @@ class Detector():
         #read gtins and save them to a data structure
         reader =csv.DictReader(open('globus_13_gtins.csv','r'))
         dict_l = []
-        dict_g = []
+        dict_g = {}
         for line in reader:
             dict_l.append(line) 
 

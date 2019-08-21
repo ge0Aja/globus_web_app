@@ -166,6 +166,17 @@ class Detector():
         #weights_path = 'darknet/backup/globus13-yolov3_2000.weights'
         weights_path2 = 'darknet/backup/globustags-yolov3_1000.weights'
 
+        #read gtins and save them to a data structure
+        reader =csv.DictReader(open('globus_13_gtins.csv','r'))
+        dict_l = []
+        dict_g = {}
+        for line in reader:
+            dict_l.append(line) 
+
+        for coi in dict_l:
+            dict_g[coi['class']] = coi['gtin']
+
+
         
         #load network and meta using darkflow library
         #self.net = dn.load_net(os.path.join(base_path,cfg_path).encode('utf-8'),os.path.join(base_path,weights_path).encode('utf-8'),0)
