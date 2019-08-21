@@ -48,7 +48,7 @@ In the following table we list the web methods along with their expected request
 | ---------- |----------|---------- |---------- |
 |   /state   | GET      | (empty)   | response_state.json |
 | /detect_img| POST     | Imagefile (PNG,JPG,JPEG) ; to_detect (product,tag) | response_tag_img.json response_product_img.json |
-| /detect_vid| POST     | vidfile (AVI,MP4) ; to_detect (product,tag) | response_tag_vid.json response_product_vid.json |
+| /detect_vid| POST     | vidfile (AVI,MP4) ; to_detect (product,tag) |  response_product_vid.json |
 
 
 By looking at the JSON files of detections we can notice three parameters in the response, in the following table we show possible values for each parameter
@@ -56,7 +56,9 @@ By looking at the JSON files of detections we can notice three parameters in the
 | __Parameter__ | __Description__ | __Possible values__ |
 |---------------|-----------------|---------------------|
 | objs, objects | detected objects | [], dictionary, list|
-| cls | object's class | class name, unique ID |
+| typ | type of detected object (Tag,Product) | string |
+| gtin | object's GTIN | EAN 13, unique ID |
+|txt | price if the detected object is a tag | float |
 | h | height of detected object in pixels |  integer |
 | w | width of detected object in pixels | integer |
 | x | object's upper left corner X coord. | integer |
