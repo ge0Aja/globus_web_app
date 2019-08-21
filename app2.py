@@ -225,7 +225,11 @@ class Detector():
                     LR_y = int(center_y - height/2)
                     if LR_y < 0:
                         LR_y = 0
-                    lis.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
+                    #old return
+                    #lis.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
+                    #new return (dummy data gtin and price)
+                    #the new return contains dummy data for the sake of project completion, this section will be updated when the new model is uploaded
+                    lis.append(dict(typ='Tag',gtin='7613033635205',txt='4.79',x=UL_x,y=UL_y,w=width,h=height))
                     i+=1
                 # draw results for debugging
                 im  = cvDrawBoxes(res,cv2.imread(filename))
@@ -319,7 +323,11 @@ class Detector():
                     LR_y = int(center_y - height/2)
                     if LR_y < 0:
                         LR_y = 0
-                    lis_inner.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
+                    #old return
+                    #lis_inner.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
+                    #new return (dummy data gtin and price)
+                    #the new return contains dummy data for the sake of project completion, this section will be updated when the new model is uploaded
+                    lis.append(dict(typ='Tag',gtin='7613033635205',txt='4.79',x=UL_x,y=UL_y,w=width,h=height))
                     inner+=1 
 
                 lis_outer.append(dict(frame=counter_out,objects=lis_inner))

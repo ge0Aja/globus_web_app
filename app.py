@@ -10,6 +10,7 @@ import traceback
 from json import dumps
 import cv2
 import imutils
+import csv
 
 
 base_path = os.getcwd()
@@ -166,6 +167,15 @@ class Detector():
         weights_path = 'darknet/backup/globus13-yolov3_2000.weights'
         #weights_path2 = 'darknet/backup/globustags-yolov3_1000.weights'
 
+        #read gtins and save them to a data structure
+        reader =csv.DictReader(open('globus_13_gtins.csv','r'))
+        dict_l = []
+        dict_g = []
+        for line in reader:
+            dict_l.append(line) 
+
+        for coi in dict_l:
+            dict_g[coi['class']] = coi['gtin']
         
         #load network and meta using darkflow library
         self.net = dn.load_net(os.path.join(base_path,cfg_path).encode('utf-8'),os.path.join(base_path,weights_path).encode('utf-8'),0)
@@ -225,7 +235,11 @@ class Detector():
                     LR_y = int(center_y - height/2)
                     if LR_y < 0:
                         LR_y = 0
-                    lis.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
+
+                    #old return
+                    #lis.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
+                    #new return
+                    lis.append(dict(typ='Product',gtin=dict_g[class_type],txt='',x=UL_x,y=UL_y,w=width,h=height))
                     i+=1
                 # draw on image for debugging
                 im  = cvDrawBoxes(res,cv2.imread(filename))
@@ -319,7 +333,10 @@ class Detector():
                     LR_y = int(center_y - height/2)
                     if LR_y < 0:
                         LR_y = 0
-                    lis_inner.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
+                    #old return
+                    #lis_inner.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
+                    #new return
+                    lis_inner.append(dict(typ='Product',gtin=dict_g[class_type],txt='',x=UL_x,y=UL_y,w=width,h=height))
                     inner+=1 
 
                 lis_outer.append(dict(frame=counter_out,objects=lis_inner))
