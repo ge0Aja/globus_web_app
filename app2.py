@@ -169,12 +169,12 @@ class Detector():
         #read gtins and save them to a data structure
         reader =csv.DictReader(open('globus_13_gtins.csv','r'))
         dict_l = []
-        dict_g = {}
+        self.dict_g = {}
         for line in reader:
             dict_l.append(line) 
 
         for coi in dict_l:
-            dict_g[coi['class']] = coi['gtin']
+            self.dict_g[coi['class']] = coi['gtin']
 
 
         
