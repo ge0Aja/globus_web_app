@@ -66,7 +66,8 @@ By looking at the JSON files of detections we can notice three parameters in the
 | t | elapsed time for detection | seconds |
 | ret | return state | objects found, empty, detectiontype error ,filetype error, error |
 
-`RGB(255,0,0)`
+:construction_worker: `Currently we are returning dummy data for the "tag" json response until we upload the latest model`
+
 The 'ret' parameter explains the state of the REST web service response which can be:
 * _objects_ _found_: it means that the detection model was able to detect objects in an image or any frame in the video
 * _empty_: it means no objects were detected in an image or a any frame in the video
