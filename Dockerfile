@@ -33,8 +33,8 @@ RUN \
 
 #change library reference in darknet,py
 
-#RUN \
-#    sed -i 's/.\/libdarknet.so/\/app\/darknet\/libdarknet.so/' darknet.py
+RUN \
+    sed -i -e 's/\.\/libdarknet\.so/\/app\/darknet\/libdarknet.so/g' darknet.py
 
 # set working directory to app and run
 WORKDIR /app
