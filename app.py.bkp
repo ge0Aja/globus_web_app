@@ -11,7 +11,7 @@ from json import dumps
 import cv2
 import imutils
 import csv
-import pickle
+
 
 base_path = os.getcwd()
 
@@ -160,46 +160,30 @@ class Detector():
     def __init__(self):
         #define weights, data, cfg path and load net, paths should be in utf-8
         base_path = os.getcwd()
-        ## old model path
-        #data_path = 'darknet/data/globus_13.data'
-        #cfg_path = 'darknet/cfg/globus13-yolov3.cfg'
-        #weights_path = 'darknet/backup/globus13-yolov3_2000.weights'
-
-        data_path = 'darknet/data/globus_seed_wendel.data'
-        cfg_path = 'darknet/cfg/globus_seed_wendel.cfg'
-        weights_path = 'darknet/backup/globus_seed_wendel_2000.weights'
-
-        #read reference images for orb comparison
-        with open('orb_reference_calculated3.pickle','rb') as handle:
-            self.class_orb_ref = pickle.load(handle)
-
-        #set orb variables
-        self.orb = cv2.ORB_create(nfeatures=500)
-        FLANN_INDEX_LSH = 6
-        index_params= dict(algorithm = FLANN_INDEX_LSH,table_number = 6, key_size = 12,multi_probe_level = 1)
-        search_params = dict() #checks=50  # or pass empty dictionary
-        self.flann = cv2.FlannBasedMatcher(index_params,search_params)
+        data_path = 'darknet/data/globus_13.data'
+        #data_path2 = 'darknet/data/globus_tags.data'
+        cfg_path = 'darknet/cfg/globus13-yolov3.cfg'
+        #cfg_path2 = 'darknet/cfg/globustags-yolov3.cfg'
+        weights_path = 'darknet/backup/globus13-yolov3_2000.weights'
+        #weights_path2 = 'darknet/backup/globustags-yolov3_1000.weights'
 
         #read gtins and save them to a data structure
-        reader =csv.DictReader(open('test_shelf_list.csv','r'))
+        reader =csv.DictReader(open('globus_13_gtins.csv','r'))
         dict_l = []
         self.dict_g = {}
-        self.dict_count = {}
-        
         for line in reader:
             dict_l.append(line) 
 
         for coi in dict_l:
-            if coi['Product'] not in self.dict_g.keys():
-                self.dict_g[coi['Product']] = {coi['ORB']:coi['Barcode']}
-            try:
-                self.dict_count[coi['Product']]+=1
-            except:
-                self.dict_count[coi['Product']]=1
-                
+            self.dict_g[coi['class']] = coi['gtin']
+        
         #load network and meta using darkflow library
         self.net = dn.load_net(os.path.join(base_path,cfg_path).encode('utf-8'),os.path.join(base_path,weights_path).encode('utf-8'),0)
         self.meta = dn.load_meta(os.path.join(base_path,data_path).encode('utf-8'))
+
+        #self.net2 = dn.load_net(os.path.join(base_path,cfg_path2).encode('utf-8'),os.path.join(base_path,weights_path2).encode('utf-8'),0)
+        #self.meta2 = dn.load_meta(os.path.join(base_path,data_path2).encode('utf-8'))
+
         
     def get_state(self):
         #check if the model is loaded then the state is ready
@@ -214,48 +198,6 @@ class Detector():
 
         return dict(net1_state=net1,net2_state=net2)
 
-    def calc_orb(self,img,UL_x,UL_y,w,h,ccls):
-        if self.dict_count[ccls] ==1:
-            return 0
-        try:
-            _,desorb = self.orb.detectAndCompute(cv2.cvtColor(img[UL_y:UL_y+h,UL_x:UL_x+w],cv2.COLOR_BGR2GRAY),None)
-            m_counts = [[] for x in range(self.dict_count[ccls])]
-            for k in self.class_orb_ref[ccls].keys():
-                h_ref,w_ref = class_orb_ref[ccls][k].shape
-                img_ref = cv2.resize(self.class_orb_ref[ccls][k],None,fx=(ymax-ymin)/h_ref,fy=(xmax-xmin)/w_ref,interpolation=cv2.INTER_AREA)
-                _,desorb2 = self.orb.detectAndCompute(img_ref,None)
-                    
-                matches = self.flann.knnMatch(desorb,desorb2,k=2)
-                    
-                #count the matches that fulfill a certain threshold
-                if len(matches) < 1:
-                    continue
-                
-                m_counter = 0
-                total_counter = 0
-                #can be done in parallel
-                for match in matches:
-                    if len(match) == 2:
-                        # 0.65 of distance is best so far
-                        if match[0].distance < 0.65 * match[1].distance:
-                            m_counter+=1
-                            total_counter+=1
-                            
-                m_counts[max(int(k.split('-')[0][-1])-1,0)].append(m_counter / total_counter)
-                    
-                # get the mean value for every sub and assign the larget val
-            mxx = 0
-            for i,m_count in enumerate(m_counts):
-                mn = statistics.mean(m_count)
-                if  mn > mxx:
-                    mxx = mn
-                    orb_res = i+1
-
-            return orb_res
-        except:
-            logging.error("calculate orb for class {}".format(ccls))
-                
-
     # detect image for groceries or tags
     def detect_image(self, filename,to_detect):
         try:
@@ -265,7 +207,12 @@ class Detector():
                 res = dn.detect(self.net,self.meta,filename.encode('utf-8'))
             else:
                 return(False,[],0)
-        
+            
+            #if to_detect == 'tag':
+            #    res = dn.detect(self.net2,self.meta2,filename.encode('utf-8'))
+            #else:
+            #    return(False,[],0)
+
             e = time.time() - s
             if len(res) > 0:
                 # process the output into a dictionary
@@ -289,18 +236,13 @@ class Detector():
                     if LR_y < 0:
                         LR_y = 0
 
-                    #after getting the points call orb
-                    orb_class = self.calc_orb(img,UL_x,UL_y,w,h,class_type)
-                    
                     #old return
                     #lis.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
                     #new return
-                    lis.append(dict(typ='Product',gtin=self.dict_g[class_type][orb_class],txt='',x=UL_x,y=UL_y,w=width,h=height))
+                    lis.append(dict(typ='Product',gtin=self.dict_g[class_type],txt='',x=UL_x,y=UL_y,w=width,h=height))
                     i+=1
-
                 # draw on image for debugging
-                #im  = cvDrawBoxes(res,cv2.imread(filename))
-
+                im  = cvDrawBoxes(res,cv2.imread(filename))
                 im = cv2.cvtColor(im,cv2.COLOR_RGB2BGR)
                 cv2.imwrite('result.png',im)
                 
@@ -326,8 +268,6 @@ class Detector():
 
             # read video and set size 
             cap = cv2.VideoCapture(filename)
-            # we should get an extra flag from the client
-            # if the video is rotated
             cap.set(3,1280)
             cap.set(4,720)
 
@@ -356,14 +296,19 @@ class Detector():
                 dn.copy_image_from_bytes(darknet_image,frame_resized.tobytes())
 
                 # decide which model to use for detection based on input
+
                 # time per frame uncomment below
                 # inn_t = time.time()
 
                 if to_detect == 'product':
-                    #TODO: set a detection threshold
-                    res = dn.detect_image(self.net,self.meta,darknet_image)
+                    res = dn.detect_image(self.net,self.meta,darknet_image) # assign a threshold
                 else:
                     return (False,[],0)
+
+                #if to_detect == 'tag':
+                #    res = dn.detect_image(self.net2,self.meta2,darknet_image) # assign a threshold
+                #else:
+                #    return (False,[],0)
 
                 # time per frame uncomment below
                 #inn_t = time.time() - inn_t
@@ -388,9 +333,6 @@ class Detector():
                     LR_y = int(center_y - height/2)
                     if LR_y < 0:
                         LR_y = 0
-
-                    # call orb calc
-                    orb_res = self.orb_calc(img,UL_x,UL_y,w,h,class_type)
                     #old return
                     #lis_inner.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
                     #new return
