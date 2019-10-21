@@ -128,3 +128,29 @@ docker (or nvidia-docker) run -d -p 5000:5000 [image_name_set_in_6]:latest
 ```
 
 The last command creates a new docker container and forwards the port 5000 to the host machine. Currently, the web app operates on port 5000 which can be changed later.
+
+## Workshop Sankt-Wendel (24-25) October 2019
+There are new files needed during the workshop and can be found by clicking [Here](https://www.lri.fr/owncloud/index.php/s/kVdMiiM4gPayIIQ). The shared folder contains the following files:
+1. New "Products" weights,data, and names files
+2. New "Tags" weights,data, and names files
+3. .Pickle file which contains some reference Images for ORB features calculation
+4. Csv file with products GTINs and other information
+
+The files have to be copied to their directories as shown below:
+```
++globus_web_app
+|	+--darknet
+|	|     +--cfg
+|	|     |	   +--globus_seed_wendel.cfg
+|	|     |    +--globustags-yolov3.cfg
+|	|     +--data
+|	|     |    +--globus_seed_wendel.data
+|	|     |    +--globus_seed_wendel.names
+|	|     |    +--globus_tags.data
+|	|     |    +--globus_tags.names
+|	|     +--backup
+|	|     |    +--globustags-yolov3.weights
+|	|     |	   +--globus_seed_wendel.weights
+|	+--orb_reference.pickle
+|	+--test_shelf_list.csv
+```
