@@ -167,7 +167,7 @@ class Detector():
 
         data_path = 'darknet/data/globus_seed_wendel.data'
         cfg_path = 'darknet/cfg/globus_seed_wendel.cfg'
-        weights_path = 'darknet/backup/globus_seed_wendel_2000.weights'
+        weights_path = 'darknet/backup/globus_seed_wendel.weights'
 
         #read reference images for orb comparison
         with open('orb_reference_calculated3.pickle','rb') as handle:
