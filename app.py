@@ -74,9 +74,8 @@ def state():
     r = app.det.get_state()
     try:
         return flask.jsonify(state=r)
-    except:
-        logging.info('Error in state method\n')
-        traceback.print_exc()
+    except Exception as e:
+        logging.error(str(e))
         return flask.jsonify(state='error')
     
 # WEBMETHOD: detect objects in an uploaded image
@@ -117,10 +116,9 @@ def detect_img():
             logging.info('File is not allowed %s' % (str(filename)))
             return flask.jsonify(ret='filetype_error')
             
-    except:
+    except Exception e:
         #log error and print, we can check the error from docker logs outside the image
-        logging.info('Error in image detect method\n')
-        traceback.print_exc()
+        logging.error(str(e))
         return flask.jsonify(ret='error')
 
 # WEBMETHOD: detect objects in an uploaded video 
@@ -153,10 +151,9 @@ def detect_vid():
         else:
             logging.info('File is not allowed %s' % (str(filename)))
             return flask.jsonify(ret='filetype_error')
-    except:
+    except Exception as e:
         #log error and print, we can check the error from docker logs outside the image
-        logging.info('Error in vid detect method\n')
-        traceback.print_exc()
+        logging.error(str(e))
         return flask.jsonify(ret='error')
 
 # Detector class contains
@@ -200,6 +197,9 @@ class Detector():
         for coi in dict_l:
             if coi['Product'] not in self.dict_g.keys():
                 self.dict_g[coi['Product']] = {coi['ORB']:coi['Barcode']}
+            else:
+                self.dict_g[coi['Product']].update({coi['ORB']:coi['Barcode']})
+
             try:
                 self.dict_count[coi['Product']]+=1
             except:
@@ -217,19 +217,17 @@ class Detector():
         if self.net:
             net1= True
 
-        #if self.net2:
-        #    net2 = True
-
         return dict(net1_state=net1,net2_state=net2)
 
+
     def calc_orb(self,img,UL_x,UL_y,w,h,ccls):
-        if self.dict_count[ccls] ==1:
+        if self.dict_count[ccls] == 1:
             return 0
         try:
             _,desorb = self.orb.detectAndCompute(cv2.cvtColor(img[UL_y:UL_y+h,UL_x:UL_x+w],cv2.COLOR_BGR2GRAY),None)
             m_counts = [[] for x in range(self.dict_count[ccls])]
             for k in self.class_orb_ref[ccls].keys():
-                h_ref,w_ref = class_orb_ref[ccls][k].shape
+                h_ref,w_ref = self.class_orb_ref[ccls][k].shape
                 img_ref = cv2.resize(self.class_orb_ref[ccls][k],None,fx=h/h_ref,fy=w/w_ref,interpolation=cv2.INTER_AREA)
                 _,desorb2 = self.orb.detectAndCompute(img_ref,None)
                     
@@ -253,16 +251,16 @@ class Detector():
                     
                 # get the mean value for every sub and assign the larget val
             mxx = 0
+            orb_res = 0
             for i,m_count in enumerate(m_counts):
                 mn = statistics.mean(m_count)
                 if  mn > mxx:
                     mxx = mn
                     orb_res = i+1
-
             return orb_res
-        except:
+        except Exception  as e :
             logging.error("calculate orb for class {}".format(ccls))
-                
+            logging.error(str(e))
 
     # detect image for groceries or tags
     def detect_image(self, filename,to_detect):
@@ -304,7 +302,10 @@ class Detector():
                     #old return
                     #lis.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
                     #new return
-                    lis.append(dict(typ='Product',gtin=self.dict_g[class_type][orb_class],txt='',x=UL_x,y=UL_y,w=width,h=height))
+                    try:
+                        lis.append(dict(typ='Product',gtin=self.dict_g[class_type][orb_class],txt='',x=UL_x,y=UL_y,w=width,h=height))
+                    except:
+                        print("error in getting key val from dictg",orb_class)
                     i+=1
 
                 # draw on image for debugging
@@ -317,9 +318,9 @@ class Detector():
             else:
                 rtn = (False,[],0)
             return rtn
-        except:
+        except Exception as e:
             logging.info('Error in detect_image method\n')
-            traceback.print_exc()
+            logging.error(str(e))
 
     
     def detect_video(self,filename,to_detect):
@@ -334,8 +335,8 @@ class Detector():
             cap = cv2.VideoCapture(filename)
             # we should get an extra flag from the client
             # if the video is rotated
-            cap.set(3,1280)
-            cap.set(4,720)
+            #cap.set(3,1280)
+            #cap.set(4,720)
 
             # get frames count from file
             prop = cv2.cv.CV_CAP_PROP_FRAME_COUNT if imutils.is_cv2() else cv2.CAP_PROP_FRAME_COUNT
@@ -343,23 +344,27 @@ class Detector():
             # log info
             logging.info('File uploaded : {} , total number of frames in video {}'.format(filename,total_frames))
 
-            #create a darknet image to be used for each extracted frame
-            darknet_image = dn.make_image(net_w,net_h,3)
-
-            # create a new video to write images and save them
-            out = cv2.VideoWriter(os.path.join(os.getcwd(),'output-{}-{}.avi'.format(filename.split('.')[0]),randint(0,10000)),cv2.VideoWriter_fourcc(*"MJPG"),30.0,(net_w,net_h))
-            
             # list of results for frames
             lis_outer = []
             #call forward when start grabing the frames
             grab, frame = cap.read()
+
+            #get the h and w of the frame
+            f_h,f_w,f_c = frame.shape
+            
+            #create a darknet image to be used for each extracted frame
+            darknet_image = dn.make_image(f_w,f_h,f_c)
+
+            # create a new video to write images and save them
+            out = cv2.VideoWriter(os.path.join(os.getcwd(),'output-{}-{}.avi'.format(filename.split('.')[0]),randint(0,10000)),cv2.VideoWriter_fourcc(*"MJPG"),30.0,(f_w,f_h))
+            
             s = time.time()
             counter_out = 1
 
             while grab:
                 #frame_rgb = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-                frame_resized = cv2.resize(frame,(net_w,net_h),interpolation=cv2.INTER_LINEAR)
-                dn.copy_image_from_bytes(darknet_image,frame_resized.tobytes())
+                #frame_resized = cv2.resize(frame,(net_w,net_h),interpolation=cv2.INTER_LINEAR)
+                dn.copy_image_from_bytes(darknet_image,frame.tobytes())
 
                 # decide which model to use for detection based on input
                 # time per frame uncomment below
@@ -367,7 +372,7 @@ class Detector():
 
                 if to_detect == 'product':
                     #TODO: set a detection threshold
-                    res = dn.detect_image(self.net,self.meta,darknet_image)
+                    res = dn.detect_image(self.net,self.meta,darknet_image,0.65)
                 else:
                     return (False,[],0)
 
@@ -426,9 +431,9 @@ class Detector():
                 rtn = (False,[],0)
             return rtn
         
-        except:
+        except Exception as e:
             logging.info('Error in detect video method')
-            traceback.print_exc()
+            logging.error(str(e))
 
     
 if __name__ == '__main__':
@@ -442,6 +447,5 @@ if __name__ == '__main__':
         app.det = Detector()
         #start the application port 5000
         app.run(debug=True,host='0.0.0.0',port=5000)
-    except:
-        logging.info('Error in main')
-        traceback.print_exc()
+    except Exception as e:
+        logging.error(str(e))
