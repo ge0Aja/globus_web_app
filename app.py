@@ -270,8 +270,8 @@ class Detector():
             s= time.time()
             img = cv2.imread(filename)
             if to_detect == 'product':
-                #res = dn.detect(self.net,self.meta,filename.encode('utf-8'))
-                res = dn.detect(self.net,self.meta,img) # set threshold
+                res = dn.detect(self.net,self.meta,filename.encode('utf-8'))
+                #res = dn.detect_image(self.net,self.meta,img) # set threshold
             else:
                 return(False,[],0)
         
@@ -299,7 +299,7 @@ class Detector():
                         LR_y = 0
 
                     #after getting the points call orb
-                    orb_class = self.calc_orb(img,UL_x,UL_y,w,h,class_type)
+                    orb_class = self.calc_orb(img,UL_x,UL_y,width,height,class_type)
                     
                     #old return
                     #lis.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
@@ -396,7 +396,7 @@ class Detector():
                         LR_y = 0
 
                     # call orb calc
-                    orb_res = self.orb_calc(frame_resized,UL_x,UL_y,w,h,class_type)
+                    orb_res = self.orb_calc(frame_resized,UL_x,UL_y,width,height,class_type)
                     #old return
                     #lis_inner.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
                     #new return
