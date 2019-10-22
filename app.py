@@ -6,13 +6,12 @@ import datetime
 import werkzeug
 import sys
 import urllib
-import traceback
-from json import dumps
 import cv2
 import imutils
 import csv
 import pickle
 from random import randint
+import statistics
 
 base_path = os.getcwd()
 
@@ -291,7 +290,7 @@ class Detector():
                     if UL_x < 0:
                         UL_x = 0
                     UL_y = int(center_y + height/2) #Upper left Y
-                    LR_x = int(center_x + width/2)
+                    #LR_x = int(center_x + width/2)
                     LR_y = int(center_y - height/2)
                     if LR_y < 0:
                         LR_y = 0
@@ -328,8 +327,8 @@ class Detector():
             # get network size
             # change line below to self.net2 if tags to be detected
             
-            net_w = dn.network_width(self.net)
-            net_h = dn.network_height(self.net)
+            #net_w = dn.network_width(self.net)
+            #net_h = dn.network_height(self.net)
 
             # read video and set size 
             cap = cv2.VideoCapture(filename)
@@ -395,17 +394,17 @@ class Detector():
                     if UL_x < 0:
                         UL_x = 0
                     UL_y = int(center_y + height/2) #Upper left Y
-                    LR_x = int(center_x + width/2)
+                    #LR_x = int(center_x + width/2)
                     LR_y = int(center_y - height/2)
                     if LR_y < 0:
                         LR_y = 0
 
                     # call orb calc
-                    orb_res = self.orb_calc(frame_resized,UL_x,UL_y,width,height,class_type)
+                    orb_res = self.orb_calc(frame,UL_x,UL_y,width,height,class_type)
                     #old return
                     #lis_inner.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
                     #new return
-                    lis_inner.append(dict(typ='Product',gtin=self.dict_g[class_type],txt='',x=UL_x,y=UL_y,w=width,h=height))
+                    lis_inner.append(dict(typ='Product',gtin=self.dict_g[class_type][orb_res],txt='',x=UL_x,y=UL_y,w=width,h=height))
                     inner+=1 
 
                 lis_outer.append(dict(frame=counter_out,objects=lis_inner))
@@ -417,8 +416,7 @@ class Detector():
                 #im  = cvDrawBoxes(res,frame_resized)
                 #im = cv2.cvtColor(im,cv2.COLOR_RGB2BGR)
 
-                out.write(im)
-                
+                out.write(frame)
                 grab, frame = cap.read()
     
             t = time.time() - s
