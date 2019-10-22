@@ -154,3 +154,11 @@ The files have to be copied to their directories as shown below:
 |	+--orb_reference.pickle
 |	+--test_shelf_list.csv
 ```
+
+N.B. I've Encountred some problems with the new testing server, apparently docker is being blocked by appArmor.
+     To tackle the problem I've disabled appArmor on the server for now.
+```
+1. sudo systemctl disable apparmor.service --now
+2.  sudo service apparmor teardown
+3. sudo aa-status #check status
+```

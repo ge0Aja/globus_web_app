@@ -230,7 +230,7 @@ class Detector():
             m_counts = [[] for x in range(self.dict_count[ccls])]
             for k in self.class_orb_ref[ccls].keys():
                 h_ref,w_ref = class_orb_ref[ccls][k].shape
-                img_ref = cv2.resize(self.class_orb_ref[ccls][k],None,fx=(ymax-ymin)/h_ref,fy=(xmax-xmin)/w_ref,interpolation=cv2.INTER_AREA)
+                img_ref = cv2.resize(self.class_orb_ref[ccls][k],None,fx=h/h_ref,fy=w/w_ref,interpolation=cv2.INTER_AREA)
                 _,desorb2 = self.orb.detectAndCompute(img_ref,None)
                     
                 matches = self.flann.knnMatch(desorb,desorb2,k=2)
