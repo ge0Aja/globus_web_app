@@ -130,6 +130,11 @@ docker (or nvidia-docker) run -d -p 5000:5000 [image_name_set_in_6]:latest
 The last command creates a new docker container and forwards the port 5000 to the host machine. Currently, the web app operates on port 5000 which can be changed later.
 
 ## Workshop Sankt-Wendel (24-25) October 2019
+A test server has been setup, it has a running docker image of the web service. To call the web methods use the following IP / Port:
+```
+131.246.195.235 : 5000
+```
+
 There are new files needed during the workshop and can be found by clicking [Here](https://www.lri.fr/owncloud/index.php/s/kVdMiiM4gPayIIQ). The shared folder contains the following files:
 1. New "Products" weights,data, and names files
 2. New "Tags" weights,data, and names files
