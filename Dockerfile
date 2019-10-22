@@ -28,13 +28,13 @@ RUN \
 #    sed -i 's/GPU=.*/GPU=1/' Makefile && \
 #    sed -i 's/CUDNN=.*/CUDNN=1/' Makefile && \
 #    sed -i 's/CUDNN_HALF=.*/CUDNN_HALF=1/' Makefile && \
-#    sed -i 's/LIBSO=.*/LIBSO=1/' Makefile && \
+    sed -i 's/LIBSO=.*/LIBSO=1/' Makefile && \
     make
 
 #change library reference in darknet,py
 
-#RUN \
-#    sed -i 's/.\/libdarknet.so/\/app\/darknet\/libdarknet.so/' darknet.py
+RUN \
+    sed -i -e 's/\.\/libdarknet\.so/\/app\/darknet\/libdarknet.so/g' darknet.py
 
 # set working directory to app and run
 WORKDIR /app

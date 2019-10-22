@@ -99,11 +99,18 @@ def detect_img():
             logging.info('Save Uploaded file to %s' % (str(filename)))
             #call detect_image
             rtn = app.det.detect_image(filename,to_detect)
-            #process the return if True and JSONIFY
+            
+            # default error response
+            ret = flask.jsonify(ret='empty')
+
+            #process the return if True
             if rtn[0]:
-                return flask.jsonify(ret='objects_found',objs=rtn[1],t=rtn[2])
-            else:
-                return flask.jsonify(ret='empty')
+                ret = flask.jsonify(ret='objects_found',objs=rtn[1],t=rtn[2])
+            
+            # add CORS header
+            ret.headers['Access-Control-Allow-Origin'] = '*'
+
+            return ret
         else:
             logging.info('File is not allowed %s' % (str(filename)))
             return flask.jsonify(ret='filetype_error')
