@@ -116,7 +116,7 @@ def detect_img():
             logging.info('File is not allowed %s' % (str(filename)))
             return flask.jsonify(ret='filetype_error')
             
-    except Exception e:
+    except Exception as e:
         #log error and print, we can check the error from docker logs outside the image
         logging.error(str(e))
         return flask.jsonify(ret='error')
