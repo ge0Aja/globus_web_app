@@ -12,6 +12,7 @@ import cv2
 import imutils
 import csv
 import pickle
+from random import randint
 
 base_path = os.getcwd()
 
@@ -267,9 +268,10 @@ class Detector():
     def detect_image(self, filename,to_detect):
         try:
             s= time.time()
-
+            img = cv2.imread(filename)
             if to_detect == 'product':
-                res = dn.detect(self.net,self.meta,filename.encode('utf-8'))
+                #res = dn.detect(self.net,self.meta,filename.encode('utf-8'))
+                res = dn.detect(self.net,self.meta,img) # set threshold
             else:
                 return(False,[],0)
         
@@ -306,10 +308,10 @@ class Detector():
                     i+=1
 
                 # draw on image for debugging
-                #im  = cvDrawBoxes(res,cv2.imread(filename))
+                img  = cvDrawBoxes(res,img)
 
-                im = cv2.cvtColor(im,cv2.COLOR_RGB2BGR)
-                cv2.imwrite('result.png',im)
+                #im = cv2.cvtColor(im,cv2.COLOR_RGB2BGR)
+                cv2.imwrite('result-{}-{}.png'.format(filename.split('.')[0],randint(0,10000)),img)
                 
                 rtn = (True,lis,e)
             else:
@@ -328,9 +330,6 @@ class Detector():
             net_w = dn.network_width(self.net)
             net_h = dn.network_height(self.net)
 
-            #net_w = dn.network_width(self.net2)
-            #net_h = dn.network_height(self.net2)
-
             # read video and set size 
             cap = cv2.VideoCapture(filename)
             # we should get an extra flag from the client
@@ -348,7 +347,7 @@ class Detector():
             darknet_image = dn.make_image(net_w,net_h,3)
 
             # create a new video to write images and save them
-            out = cv2.VideoWriter(os.path.join(os.getcwd(),'output.avi'),cv2.VideoWriter_fourcc(*"MJPG"),30.0,(net_w,net_h))
+            out = cv2.VideoWriter(os.path.join(os.getcwd(),'output-{}-{}.avi'.format(filename.split('.')[0]),randint(0,10000)),cv2.VideoWriter_fourcc(*"MJPG"),30.0,(net_w,net_h))
             
             # list of results for frames
             lis_outer = []
@@ -358,8 +357,8 @@ class Detector():
             counter_out = 1
 
             while grab:
-                frame_rgb = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
-                frame_resized = cv2.resize(frame_rgb,(net_w,net_h),interpolation=cv2.INTER_LINEAR)
+                #frame_rgb = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+                frame_resized = cv2.resize(frame,(net_w,net_h),interpolation=cv2.INTER_LINEAR)
                 dn.copy_image_from_bytes(darknet_image,frame_resized.tobytes())
 
                 # decide which model to use for detection based on input
@@ -397,7 +396,7 @@ class Detector():
                         LR_y = 0
 
                     # call orb calc
-                    orb_res = self.orb_calc(img,UL_x,UL_y,w,h,class_type)
+                    orb_res = self.orb_calc(frame_resized,UL_x,UL_y,w,h,class_type)
                     #old return
                     #lis_inner.append(dict(cls=class_type,x=UL_x,y=UL_y,w=width,h=height))
                     #new return
@@ -410,8 +409,8 @@ class Detector():
                     counter_out+=1
                 
                 # for debuging draw the detections around the frame and save the file to check it later
-                im  = cvDrawBoxes(res,frame_resized)
-                im = cv2.cvtColor(im,cv2.COLOR_RGB2BGR)
+                #im  = cvDrawBoxes(res,frame_resized)
+                #im = cv2.cvtColor(im,cv2.COLOR_RGB2BGR)
 
                 out.write(im)
                 

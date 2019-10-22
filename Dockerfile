@@ -31,7 +31,7 @@ RUN \
     sed -i 's/LIBSO=.*/LIBSO=1/' Makefile && \
     make
 
-#change library reference in darknet,py
+#change library reference in darknet.py
 
 RUN \
     sed -i -e 's/\.\/libdarknet\.so/\/app\/darknet\/libdarknet.so/g' darknet.py
