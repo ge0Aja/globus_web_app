@@ -1,38 +1,24 @@
-import flask
-import os
-import logging
-import time
-import datetime
-import werkzeug
 import sys
 import cv2
 import imutils
 import csv
 import pickle
+from random import randint
 import statistics
+import os
+import logging
+import time
 import traceback
-
 base_path = os.getcwd()
 
 py_path = os.path.join(base_path,'darknet/python')
 darknet_path = os.path.join(base_path,'darknet')
-upload_path = 'uploads'
 
 sys.path.append(py_path)
 sys.path.append(darknet_path)
 
 import darknet as dn
 
-UPLOAD_FOLDER = os.path.join(base_path,'uploads')
-
-ALLOWED_IMAGE_EXTENSIONS = set(['png','jpg','jpeg'])
-ALLOWED_VIDEO_EXTENSIONS = set(['avi','mp4','mov'])
-ALLOWED_DETECTIONS = set(['tag','product'])
-
-app = flask.Flask(__name__)
-
-
-# STATICMETHOD: used for debugging and drawing on image or video for results comparison
 def convertBack(x, y, w, h):
     xmin = int(round(x - (w / 2)))
     xmax = int(round(x + (w / 2)))
@@ -53,106 +39,6 @@ def cvDrawBoxes(detection):
 
     return (pt1,pt2)
 
-# STATICMETHOD: check uploaded files name formatting and extension
-def allow_file(filename,t):
-    if t == 'IMG':
-        return ('.' in filename and filename.split('.')[-1] in ALLOWED_IMAGE_EXTENSIONS)
-    else:
-        return ('.' in filename and filename.split('.')[-1] in ALLOWED_VIDEO_EXTENSIONS)
-
-# WEBMETHOD: get the state of the loaded model
-@app.route('/state',methods=['GET'])
-def state():
-    r = app.det.get_state()
-    try:
-        return flask.jsonify(state=r)
-    except Exception as e:
-        logging.error(str(e))
-        return flask.jsonify(state='error')
-    
-# WEBMETHOD: detect objects in an uploaded image
-@app.route('/detect_img',methods=['POST'])
-def detect_img():
-    #get the image load from the request
-    try:
-        imagefile = flask.request.files['imagefile'] # name is a variable
-        to_detect = flask.request.form['to_detect']
-        # check if in allowed detection types 
-        if not to_detect in ALLOWED_DETECTIONS:
-            return flask.jsonify(ret='detectiontype_error')
-        # wrap the file name and check its extension
-        filename_ = str(datetime.datetime.now()).replace(' ', '_') + \
-            werkzeug.secure_filename(imagefile.filename)
-        filename = os.path.join(UPLOAD_FOLDER,filename_)
-        logging.info('New File name %s' % (str(filename)))
-
-        if allow_file(filename,'IMG'): 
-            imagefile.save(filename)
-
-            logging.info('Save Uploaded file to %s' % (str(filename)))
-            #call detect_image
-            rtn = app.det.detect_image(filename,to_detect)
-
-            # default error response
-            ret = flask.jsonify(ret='empty')
-
-            #process the return if True
-            if rtn[0]:
-                ret = flask.jsonify(ret='objects_found',objs=rtn[1],t=rtn[2])
-            
-            # add CORS header
-            ret.headers['Access-Control-Allow-Origin'] = '*'
-
-            return ret
-        else:
-            logging.info('File is not allowed %s' % (str(filename)))
-            return flask.jsonify(ret='filetype_error')
-            
-    except Exception as e:
-        #log error and print, we can check the error from docker logs outside the image
-        logging.error(str(e))
-        return flask.jsonify(ret='error')
-
-# WEBMETHOD: detect objects in an uploaded video 
-@app.route('/detect_vid',methods=['POST'])
-def detect_vid():
-    try:
-        #get video load from the request
-        vidfile = flask.request.files['vidfile'] # name is a variable
-        to_detect = flask.request.form['to_detect']
-        # check if in allowed detection types 
-        if not to_detect in ALLOWED_DETECTIONS:
-            return flask.jsonify(ret='detectiontype_error')
-        # wrap the file name and check its extension
-        filename_ = str(datetime.datetime.now()).replace(' ', '_') + \
-            werkzeug.secure_filename(vidfile.filename)
-        filename = os.path.join(UPLOAD_FOLDER,filename_)
-        logging.info('New File name %s' % (str(filename)))
-
-        if allow_file(filename,'VID'): 
-            vidfile.save(filename)
-            logging.info('Save Uploaded video file to %s' % (str(filename)))
-            # call the video detection method
-            rtn = app.det.detect_video(filename,to_detect)
-
-            if rtn[0]:
-                # we have results
-                return flask.jsonify(ret='objects_found',objs=rtn[1],t=rtn[2])
-            else:
-                return flask.jsonify(ret='empty')
-        else:
-            logging.info('File is not allowed %s' % (str(filename)))
-            return flask.jsonify(ret='filetype_error')
-    except Exception as e:
-        #log error and print, we can check the error from docker logs outside the image
-        logging.error(str(e))
-        return flask.jsonify(ret='error')
-
-# Detector class contains
-# init()
-# get_state()
-# detect_image()
-# detect_video
 class Detector():
     def __init__(self):
         #define weights, data, cfg path and load net, paths should be in utf-8
@@ -210,6 +96,7 @@ class Detector():
             net1= True
 
         return dict(net1_state=net1,net2_state=net2)
+
 
     def calc_orb(self,img,ccls):
         if self.dict_count[ccls] == 1:
@@ -302,6 +189,7 @@ class Detector():
             logging.info('Error in detect_image method\n')
             logging.error(str(e))
 
+    
     def detect_video(self,filename,to_detect):
         try:        
             if not to_detect == 'product':
@@ -365,7 +253,7 @@ class Detector():
     
             t = time.time() - s
             cap.release()
-            #out.release()
+            out.release()
 
             if counter_out > 0:
                 rtn = (True,lis_outer,t)
@@ -382,13 +270,19 @@ class Detector():
 if __name__ == '__main__':
     try:
         # init logger
+        UPLOAD_FOLDER = 'uploads'
         logging.getLogger().setLevel(logging.INFO)
         # create uploads directory 
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
         # create a new instance of the Detector class
-        app.det = Detector()
+        #app.det = Detector()
+
+        detector = Detector()
+        #rrt = detector.detect_image('DolceGusto-84889-3102.jpg','product')
+        rrt = detector.detect_video('DolceGusto.MOV','product')
+        print(rrt)
         #start the application port 5000
-        app.run(debug=True,host='0.0.0.0',port=5000)
+        #app.run(debug=True,host='0.0.0.0',port=5000)
     except Exception as e:
         logging.error(str(e))
