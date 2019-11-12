@@ -215,7 +215,7 @@ class Detector():
 
             darknet_image = dn.make_image(f_w,f_h,f_c)
                
-            #out = cv2.VideoWriter(os.path.join(os.getcwd(),'output-{}.avi'.format(filename)),cv2.VideoWriter_fourcc(*"MJPG"),30.0,(f_w,f_h))
+            out = cv2.VideoWriter(os.path.join(os.getcwd(),'output-{}.avi'.format(filename)),cv2.VideoWriter_fourcc(*"MJPG"),30.0,(f_w,f_h))
             
             s = time.time()
             counter_out = 1
@@ -238,8 +238,8 @@ class Detector():
                     orb_class = self.calc_orb(frame[y_mn:y_mn+h,x_mn:x_mn+w],class_type)
                     
                     #debug
-                    #cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 3)
-                    #cv2.putText(frame,class_type +" [" + str(round(res[inner][1] * 100, 2)) + "]",(pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,[0, 255, 0], 2)
+                    cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 3)
+                    cv2.putText(frame,class_type +" [" + str(round(res[inner][1] * 100, 2)) + "GTIN " +self.dict_g[class_type][str(orb_class)] +"]",(pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,[0, 255, 0], 2)
                    
                     lis_inner.append(dict(typ='Product',gtin=self.dict_g[class_type][str(orb_class)],txt='',x=x_mn,y=y_mn,w=w,h=h))
                     inner+=1
@@ -248,7 +248,7 @@ class Detector():
                 if inner > 0:
                     counter_out+=1
             
-                #out.write(frame)
+                out.write(frame)
                 grab, frame = cap.read()
     
             t = time.time() - s
