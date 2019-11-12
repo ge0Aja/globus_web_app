@@ -133,23 +133,17 @@ class Detector():
     def __init__(self):
         # define weights, data, cfg path and load net, paths should be in utf-8
         base_path = os.getcwd()
-        # old model path
-        # data_path = 'darknet/data/globus_13.data'
-        # cfg_path = 'darknet/cfg/globus13-yolov3.cfg'
-        # weights_path = 'darknet/backup/globus13-yolov3_2000.weights'
-
         data_path = 'darknet/data/globus_seed_wendel.data'
         cfg_path = 'darknet/cfg/globus_seed_wendel.cfg'
         weights_path = 'darknet/backup/globus_seed_wendel.weights'
 
         # read reference images for orb comparison
-        with open('orb_reference_calculated3.pickle', 'rb') as handle:
+        with open('orb_reference_calculated.pickle', 'rb') as handle:
             self.class_orb_ref = pickle.load(handle)
         # load digits detector
-        with open('digits_cls3.pickle', 'rb') as handle:
+        with open('digits_cls.pickle', 'rb') as handle:
             self.clf = pickle.load(handle)
             logging.info("Digits recognition model is loaded")
-
         # set orb variables
         self.orb = cv2.ORB_create(nfeatures=500)
         FLANN_INDEX_LSH = 6
@@ -165,7 +159,6 @@ class Detector():
 
         for line in reader:
             dict_l.append(line)
-
         for coi in dict_l:
             if coi['Product'] not in self.dict_g.keys():
                 self.dict_g[coi['Product']] = {coi['ORB']: coi['Barcode']}
@@ -262,7 +255,7 @@ class Detector():
                     # cv2.putText(img[ymin:ymax,xmin:xmax], str(int(nbr[0])) , (rect[0], rect[1]),cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 255), 1)
                 except:
                     pass
-                    
+
         return ''.join(p for p in ext_price)
 
     def detect_image(self, filename):
@@ -357,7 +350,7 @@ class Detector():
             darknet_image = dn.make_image(f_w, f_h, f_c)
 
             # DEBUG:
-            #out = cv2.VideoWriter(os.path.join(os.getcwd(),'output-{}.avi'.format(filename)),cv2.VideoWriter_fourcc(*"MJPG"),30.0,(f_w,f_h))
+            # out = cv2.VideoWriter(os.path.join(os.getcwd(),'output-{}.avi'.format(filename)),cv2.VideoWriter_fourcc(*"MJPG"),30.0,(f_w,f_h))
 
             s = time.time()
             counter_out = 1
@@ -437,7 +430,6 @@ class Detector():
             logging.info('Error in detect video method')
             logging.error(str(e))
             traceback.print_exc()
-
 
 if __name__ == '__main__':
     try:
