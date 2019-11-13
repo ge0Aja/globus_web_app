@@ -254,7 +254,8 @@ class Detector():
                 except:
                     pass
         if len(ext_price) > 0:
-            return ''.join(p for p in ext_price.reverse())
+            ext_price.reverse()
+            return ''.join(p for p in ext_price)
         else:
             return ''
 
@@ -288,18 +289,17 @@ class Detector():
                         orb_class = self.calc_orb(img[y_mn:y_mn+h, x_mn:x_mn+w], class_type)
                         gtin = self.dict_g[class_type][str(orb_class)]
                         typ = "Product"
+                        # DEBUG:
+                        #cv2.rectangle(img, pt1, pt2, (0, 255, 0), 3)
+                        #cv2.putText(img, class_type +" [" + str(round(res[i][1] * 100, 2)) + "]",(pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,[0, 255, 0], 2)
+                        #cv2.imwrite('last_result.jpg', img)
+                        try:
+                            lis.append(dict(typ=typ, gtin=gtin, txt=txt, x=x_mn, y=y_mn, w=w, h=h))
+                        except Exception as e2:
+                            logging.error(e2)
                     else:
                         lis_attend.append([y_mn, x_mn, h, w])
 
-                    # DEBUG:
-                    #cv2.rectangle(img, pt1, pt2, (0, 255, 0), 3)
-                    #cv2.putText(img, class_type +" [" + str(round(res[i][1] * 100, 2)) + "]",(pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,[0, 255, 0], 2)
-                    #cv2.imwrite('last_result.jpg', img)
-
-                    try:
-                        lis.append(dict(typ=typ, gtin=gtin, txt=txt, x=x_mn, y=y_mn, w=w, h=h))
-                    except Exception as e2:
-                        logging.error(e2)
                     i += 1
 
                 # before return go over the list of tags
@@ -379,10 +379,9 @@ class Detector():
                         orb_class = self.calc_orb(frame_g[y_mn:y_mn+h, x_mn:x_mn+w], class_type)
                         gtin = self.dict_g[class_type][str(orb_class)]
                         typ = "Product"
+                        lis_inner.append(dict(typ=typ, gtin=gtin, txt=txt, x=x_mn, y=y_mn, w=w, h=h))
                     else:
                         lis_attend.append([y_mn, x_mn, h, w])
-
-                    lis_inner.append(dict(typ=typ, gtin=gtin, txt=txt, x=x_mn, y=y_mn, w=w, h=h))
 
                     inner += 1
 
