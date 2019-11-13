@@ -128,7 +128,6 @@ def detect_vid():
         logging.error(str(e))
         return flask.jsonify(ret='error')
 
-
 class Detector():
     def __init__(self):
         # define weights, data, cfg path and load net, paths should be in utf-8
@@ -178,7 +177,6 @@ class Detector():
         # check if the model is loaded then the state is ready
         net1 = False
         net2 = False
-
         if self.net:
             net1 = True
 
