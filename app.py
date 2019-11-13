@@ -191,7 +191,7 @@ class Detector():
 
             for k in self.class_orb_ref[ccls].keys():
                 h_ref, w_ref = self.class_orb_ref[ccls][k].shape
-                h, w, _ = img.shape
+                h, w = img.shape
                 img_ref = cv2.resize(self.class_orb_ref[ccls][k], None, fx=h/h_ref, fy=w/w_ref, interpolation=cv2.INTER_AREA)
                 _, desorb2 = self.orb.detectAndCompute(img_ref, None)
 
@@ -253,8 +253,10 @@ class Detector():
                     # cv2.putText(img[ymin:ymax,xmin:xmax], str(int(nbr[0])) , (rect[0], rect[1]),cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 255), 1)
                 except:
                     pass
-
-        return ''.join(p for p in ext_price)
+        if len(ext_price) > 0:
+            return ''.join(p for p in ext_price.reverse())
+        else:
+            return ''
 
     def detect_image(self, filename):
         try:
