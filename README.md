@@ -31,7 +31,7 @@ This method uses the loaded model to predict objects in a still image. It takes 
 This method loops over a video file to extract frames and uses the loaded model to predict objects in each extracted frame. The method uses a single temporary variable to load each extracted frame and perform the detection. It takes two inputs as the previous method: the filename which was uploaded using the web service and a detection choice forwarded by the calling webmethod. The method returns  a list structure that contains a boolean indicator (results, no results) and a list of dictionary lists (one per frame - if any objects are found), in addition to the elapsed time to perform the detection.
 
 ### Web Methods
-The web methods are the functionality of the REST web service, each method calls a different method from Detector class. The web methods are registered at the route of the Flask app. 
+The web methods are the functionality of the REST web service, each method calls a different method from Detector class. The web methods are registered at the route of the Flask app.
 
 #### /state
 This method calls get_state() method from Detector class and forwards the return as a JSON string.
@@ -47,9 +47,10 @@ In the following table we list the web methods along with their expected request
 | __Method__ | __Type__ | __Input__ | __Output__ (expected_responses folder) |
 | ---------- |----------|---------- |---------- |
 |   /state   | GET      | (empty)   | response_state.json |
-| /detect_img| POST     | Imagefile (PNG,JPG,JPEG) ; to_detect (product,tag) | response_tag_img.json response_product_img.json |
-| /detect_vid| POST     | vidfile (AVI,MP4) ; to_detect (product,tag) |  response_product_vid.json |
+| /detect_img| POST     | Imagefile (PNG,JPG,JPEG) ; ~~to_detect (product,tag)~~ | response_tag_img.json response_product_img.json |
+| /detect_vid| POST     | vidfile (AVI,MP4,MOV,M4V) ; ~~to_detect (product,tag)~~ |  response_product_vid.json |
 
+[+ to_detect variable is omitted the front-end can send the (image, video file) solely +]
 
 By looking at the JSON files of detections we can notice three parameters in the response, in the following table we show possible values for each parameter
 
@@ -66,7 +67,8 @@ By looking at the JSON files of detections we can notice three parameters in the
 | t | elapsed time for detection | seconds |
 | ret | return state | objects found, empty, detectiontype error ,filetype error, error |
 
-:construction_worker: `Currently we are returning dummy data for the "tag" json response until we upload the latest model`
+~~:construction_worker: `Currently we are returning dummy data for the "tag" json response until we upload the latest model`~~
+[+ The latest model has been uploaded and the current back-end is using it Nov, 14, 2019 +]
 
 The 'ret' parameter explains the state of the REST web service response which can be:
 * _objects_ _found_: it means that the detection model was able to detect objects in an image or any frame in the video
@@ -111,7 +113,7 @@ git submodule update
 ```
 mkdir darknet/backup
 ```
-6. Download models weights files from [Here](https://www.lri.fr/owncloud/index.php/s/tl6DSkTrqNMY346) and [Here](https://www.lri.fr/owncloud/index.php/s/CoSIqoJmg4dyJ87) Then, move them into “darknet/backup” folder
+6. Download models weights files from [Here](https://www.lri.fr/owncloud/index.php/s/lJWGsLES3Lbz3T5) Then, move them into “darknet/backup” folder
 7. Edit Dockerfile contents to enable/disable GPU support
 If you want to disable GPU support or do not have Nvidia GPU set GPU, CUDNN, and CUDNN_HALF to 0 in Dockerfile and comment the following line
 “CMD nvidia-smi -q”. If you want to keep GPU support keep the Dockerfile as is.
@@ -135,11 +137,12 @@ A test server has been setup, it has a running docker image of the web service. 
 131.246.195.235 : 5000
 ```
 
-There are new files needed during the workshop and can be found by clicking [Here](https://www.lri.fr/owncloud/index.php/s/kVdMiiM4gPayIIQ). The shared folder contains the following files:
+There are new files needed during the workshop and can be found by clicking [Here](https://www.lri.fr/owncloud/index.php/s/lJWGsLES3Lbz3T5). The shared folder contains the following files:
 1. New "Products" weights,data, and names files
 2. New "Tags" weights,data, and names files
 3. .Pickle file which contains some reference Images for ORB features calculation
 4. Csv file with products GTINs and other information
+5. .Pickle file which contains the (price) digits detector
 
 The files have to be copied to their directories as shown below:
 ```
@@ -157,6 +160,7 @@ The files have to be copied to their directories as shown below:
 |	|     |    +--globustags-yolov3.weights
 |	|     |	   +--globus_seed_wendel.weights
 |	+--orb_reference.pickle
+| +--digits_cls.pickle
 |	+--test_shelf_list.csv
 ```
 
