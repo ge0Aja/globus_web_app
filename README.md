@@ -145,7 +145,7 @@ There are new files needed during the workshop and can be found by clicking [Her
 4. Csv file with products GTINs and other information
 5. .Pickle file which contains the (price) digits detector
 
-The files have to be copied to their directories as shown below:
+[+ The files have to be copied to their directories as shown below: +]
 ```
 +globus_web_app
 |	+--darknet
