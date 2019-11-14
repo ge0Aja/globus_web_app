@@ -97,6 +97,7 @@ git submodule init
 git submodule update
 ```
 4. Copy the config files (cfg) and the data files (.data .names) from "globus_web_app_config_files" folder to "darknet/data" and "darknet/cfg" folders where the folder and file structure should be as follows:
+[+ for the newest version please follow the file placement instructions specified in the workshop section down below +]
 ```
 +globus_web_app
 |	+--darknet
@@ -168,6 +169,6 @@ N.B. I've Encountred some problems with the new testing server, apparently docke
      To tackle the problem I've disabled appArmor on the server for now.
 ```
 1. sudo systemctl disable apparmor.service --now
-2.  sudo service apparmor teardown
+2. sudo service apparmor teardown
 3. sudo aa-status #check status
 ```
