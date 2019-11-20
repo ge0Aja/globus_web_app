@@ -59,21 +59,21 @@ By looking at the JSON files of detections we can notice three parameters in the
 | objs, objects | detected objects | [], dictionary, list|
 | typ | type of detected object (Tag,Product) | string |
 | gtin | object's GTIN | EAN 13, unique ID |
-|txt | price if the detected object is a tag | float |
+| txt | price if the detected object is a tag | float |
 | h | height of detected object in pixels |  integer |
 | w | width of detected object in pixels | integer |
 | x | object's upper left corner X coord. | integer |
 | y | object's upper left corner Y coord. | integer |
 | t | elapsed time for detection | seconds |
-| ret | return state | objects found, empty, detectiontype error ,filetype error, error |
+| ret | return state | objects found, empty, detectiontype error , filetype error, error |
 
-~~:construction_worker: `Currently we are returning dummy data for the "tag" json response until we upload the latest model`~~
+~~:construction_worker: `Currently we are returning dummy data for the "tag" JSON response until we upload the latest model`~~
 [+ The latest model has been uploaded and the current back-end is using it Nov, 14, 2019 +]
 
 The 'ret' parameter explains the state of the REST web service response which can be:
 * _objects_ _found_: it means that the detection model was able to detect objects in an image or any frame in the video
 * _empty_: it means no objects were detected in an image or a any frame in the video
-* _detectiontype_ _error_: indicates that the value of 'to_detect' parameter in the web request is not linked with the current detection model. Since the current implementation includes two models, the user should specify which object to detect (tag or product). This value has to be compatible with the depolyed model e.g. if we deploy the 'grocery tags' model the value of 'to_detect' parameter should be 'tag'.
+* _detectiontype_ _error_: indicates that the value of 'to_detect' parameter in the web request is not linked with the current detection model. Since the current implementation includes two models, the user should specify which object to detect (tag or product). This value has to be compatible with the deployed model e.g. if we deploy the 'grocery tags' model the value of 'to_detect' parameter should be 'tag'.
 * _filetype_ _error_: indicates that the uploaded file type is not in the list of allowed types.
 * _error_: indicates a general error in the web application that has to be reviewed by the developer.
 
