@@ -195,7 +195,7 @@ class Detector():
                 img_ref = cv2.resize(self.class_orb_ref[ccls][k], None, fx=h/h_ref, fy=w/w_ref, interpolation=cv2.INTER_AREA)
                 _, desorb2 = self.orb.detectAndCompute(img_ref, None)
 
-                matches = self.flann.knnMatch(desorb, desorb2, k=2)
+                matches = self.flann.knnMatch(desorb, desorb2, k=3)
                 if len(matches) < 1:
                     continue
                 m_counter = 0
